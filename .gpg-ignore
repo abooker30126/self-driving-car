@@ -1,0 +1,19 @@
+# .gpg-ignore
+# List files and directory patterns that should NOT be signed by the GPG
+# signing workflow.  One pattern per line.  Blank lines and lines starting
+# with '#' are ignored.  Patterns follow shell glob syntax as matched by
+# bash's 'case' statement (e.g. '*', '**', '?').
+
+# Third-party / vendored code
+vendor/**
+node_modules/**
+.venv/**
+
+# Auto-generated files
+*.generated.sh
+*.generated.py
+*.generated.yml
+*.generated.tf
+
+# Build / CI scaffolding that doesn't need signatures
+.github/scripts/setup-gpg.sh

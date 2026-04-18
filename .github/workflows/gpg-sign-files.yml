@@ -1,0 +1,103 @@
+name: GPG Sign Modified Files
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  sign-files:
+    name: Sign Modified Files with GPG
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Import GPG private key
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+          gpg-connect-agent reloadagent /bye || true
+
+      - name: Get list of modified files
+        id: changed-files
+        run: |
+          BASE_SHA=${{ github.event.pull_request.base.sha }}
+          HEAD_SHA=${{ github.event.pull_request.head.sha }}
+          MODIFIED=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA" \
+            | grep -E '\.(sh|py|yml|tf)$' || true)
+          echo "files<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$MODIFIED" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Sign modified files
+        if: steps.changed-files.outputs.files != ''
+        env:
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          chmod +x .github/scripts/sign-files.sh
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            [ -f "$file" ] && .github/scripts/sign-files.sh "$file"
+          done <<< "${{ steps.changed-files.outputs.files }}"
+
+      - name: Commit signatures
+        env:
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Stage only .gpg.sig files
+          git add '*.gpg.sig'
+
+          if git diff --cached --quiet; then
+            echo "No new signatures to commit."
+          else
+            git commit -m "chore: add GPG signatures for modified files [skip ci]"
+            git push origin HEAD:${{ github.head_ref }}
+          fi
+
+      - name: Build signature report
+        id: report
+        if: steps.changed-files.outputs.files != ''
+        run: |
+          REPORT="## GPG Signature Report\n\n"
+          REPORT+="The following files were signed in this PR:\n\n"
+          REPORT+="| File | Signature |\n"
+          REPORT+="| ---- | --------- |\n"
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            SIG_FILE="${file}.gpg.sig"
+            if [ -f "$SIG_FILE" ]; then
+              REPORT+="| \`$file\` | ✅ \`${SIG_FILE}\` |\n"
+            else
+              REPORT+="| \`$file\` | ⚠️ not signed |\n"
+            fi
+          done <<< "${{ steps.changed-files.outputs.files }}"
+          echo "report<<EOF" >> "$GITHUB_OUTPUT"
+          printf "%b" "$REPORT" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Post signature report as PR comment
+        if: steps.changed-files.outputs.files != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const report = `${{ steps.report.outputs.report }}`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: report,
+            });
