@@ -37,3 +37,50 @@ Each challenge will contain awesome prizes (cash and others) for the most effect
 ## Open Source Base Software Support
 <img src="images/autoware_logo_1.png" alt="Autoware" width="200px"><br>
 <img src="images/Tier_IV_logo_1.png" alt="Tier IV" width="200px">
+
+---
+
+## 👋 About Me
+
+**AI Security • Autonomous Vehicles • Self-Driving Systems • Machine Learning**
+
+Building safer roads through open-source autonomous vehicle technology.
+
+---
+
+I'm a security-minded engineer pursuing my Master's in Artificial Intelligence, with a deep focus on autonomous vehicle systems. My work sits at the intersection of AI, machine learning, and self-driving car technology — exploring how intelligent systems can be made both capable and safe.
+
+**My Mission:** To help shape the future of autonomous mobility, ensuring that AI-driven vehicles are resilient, trustworthy, and safe for everyone on the road.
+
+---
+
+## 🥁 Interests & Hobbies
+
+When I'm not deep in autonomous systems research, you'll find me:
+
+- 🎸 **Playing drums and bass guitar** — rhythm keeps me grounded
+- 🚗 **Tinkering with autonomous vehicle platforms** — sensors, perception stacks, and safety systems
+- 🤖 **Experimenting with robotics and embedded systems** — merging hardware with AI software
+- 📹 **Flying FPV and cinematic drones** — applying the same autonomy principles in the air
+
+These hobbies directly fuel my curiosity and influence my professional work in autonomous systems.
+
+---
+
+## 📬 Get In Touch
+
+I'm always open to collaborating on:
+- 🚘 Autonomous vehicle research and self-driving car safety
+- 🧠 Deep learning, computer vision, and sensor fusion projects
+- 🔒 AI security and adversarial robustness for autonomous systems
+- 🔧 Open-source robotics and embedded systems development
+
+**Let's connect:**
+- 🐙 [GitHub](https://github.com/abooker30126) — Code and projects
+- 📧 Email — tony.booker@rocketmail.com
+
+---
+
+**Last Updated:** April 18, 2026
+
+Topics: `self-driving-car` `autonomous-vehicles` `deep-learning` `computer-vision` `ai-security` `robotics` `open-source`
